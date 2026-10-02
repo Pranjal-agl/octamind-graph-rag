@@ -121,4 +121,5 @@ The course allows AI tools but requires disclosure and that every member can exp
 
 ## License
 
-*TODO: decide with the team (course project; add a license file if the repo is public).*
+MIT
+
