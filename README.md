@@ -80,7 +80,7 @@ octamind-graph-rag/
 
 ## Getting started
 
-*TODO: fill in as the code is written.* Planned: create an environment, install `requirements.txt`, set the model names and API keys in `configs/`, then run the experiment scripts from `experiments/`. Every result in the report should be reproducible from a clean clone using a config file and a seed.
+Planned: create an environment, install `requirements.txt`, set the model names and API keys in `configs/`, then run the experiment scripts from `experiments/`. Every result in the report should be reproducible from a clean clone using a config file and a seed.
 
 ## Working agreements
 
