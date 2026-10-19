@@ -1,0 +1,19 @@
+# secrets and local config
+.env
+*.key
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# data, models and large outputs (keep folders, not contents)
+data/*
+!data/.gitkeep
+results/*
+!results/.gitkeep
+*.ckpt
+*.pt
+.DS_Store

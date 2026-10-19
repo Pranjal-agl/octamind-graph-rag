@@ -1,6 +1,8 @@
 # Octamind: Query-Aware Semantic Graph Retrieval for Multi-Hop QA
 
-> **Status: proposal stage.** This repository supports the CS F407 / U407 Artificial Intelligence project (Team 18, **Research** track) at BITS Pilani, Hyderabad Campus. Sections marked *planned* describe the design in our proposal and will be updated as code lands.
+CS F407 / U407 Artificial Intelligence project, **Team 18 (Octamind)**, **Research** track, BITS Pilani Hyderabad Campus.
+
+> **Status: Week 1.** The proposal is written and the repository is being set up. Sections marked *planned* describe the design in our proposal and will be updated as code lands. What exists today: the traversal scaffold (`src/traversal/`), its tests on a toy graph, and the interface spec in `docs/INTERFACE.md`.
 
 ## What this project is about
 
@@ -35,7 +37,7 @@ Traversal is a search problem (CS F407 Modules 2 and 3):
 - Evaluation function (weighted A*): `f(n) = g(n) + W·h(n)`, with a beam of width `k` or margin `m`
 - Context selection: add candidate paths in decreasing utility-per-token order until budget `B` is reached or marginal utility falls below `ε`
 
-The heuristic `h` is not admissible, so we use it for ordering and pruning, not to claim optimal paths. `W`, `k` and `m` are config values, so the search-strategy ablations (uniform-cost, greedy best-first, A*, weighted A*) need no extra code.
+The heuristic `h` is not admissible, so it is used for ordering and pruning, not to claim optimal paths. `W`, `k` and `m` are config values (`configs/traversal.yaml`), so the search-strategy ablations (uniform-cost, greedy best-first, A*, weighted A*) need no extra code.
 
 ## Systems compared
 
@@ -52,11 +54,11 @@ The heuristic `h` is not admissible, so we use it for ordering and pruning, not 
 ## Data and evaluation
 
 - **Datasets:** MuSiQue-Ans (2-, 3- and 4-hop), 2WikiMultiHopQA, HotpotQA. 200 sampled dev questions per hop level, fixed seed.
+- **Models (fixed for every system):** Gemini Flash at temperature 0 (exact model version to be pinned in `configs/`), and Gemini Embedding 2.
 - **Metrics:** EM and token-level F1; context tokens sent to the LLM; evidence recall and precision (mapped to source paragraphs); path recall where a verified gold chain exists; context reduction at matched accuracy; nodes expanded, peak frontier size and latency.
 - **Statistics:** paired bootstrap 95% confidence intervals.
-- **Fixed settings:** one LLM at temperature 0 and one embedding model for every system *(models: TODO, fill in once chosen)*.
 
-## Repository layout (planned)
+## Repository layout
 
 ```
 octamind-graph-rag/
@@ -64,23 +66,30 @@ octamind-graph-rag/
 ├── configs/             # all run settings (models, W, k, m, budgets, seeds)
 ├── data/                # dataset loaders and sampling (raw data is not committed)
 ├── src/
-│   ├── graph/           # extraction, entity linking, network construction, oracle graph
-│   ├── query/           # query analysis and seed-entity identification
-│   ├── traversal/       # edge cost, weighted A*, beam search
-│   ├── context/         # subgraph serialization, token budget, prompts
-│   ├── baselines/       # full context, vector RAG, k-hop, HippoRAG
-│   └── evaluation/      # metrics, token counting, bootstrap, plots
+│   ├── graph/           # extraction, entity linking, network construction, oracle graph (planned)
+│   ├── query/           # query analysis and seed-entity identification (planned)
+│   ├── traversal/       # edge cost, weighted A*, beam search, context selection  <- scaffold exists
+│   ├── context/         # subgraph serialization, token budget, prompts (planned)
+│   ├── baselines/       # full context, vector RAG, k-hop, HippoRAG (planned)
+│   └── evaluation/      # metrics, token counting, bootstrap, plots (planned)
 ├── experiments/         # scripts for each experiment
-├── tests/               # unit tests, including a hand-built toy graph
+├── tests/               # unit tests, including the Figure 1 toy graph
 ├── results/             # tables and figures
 └── docs/
+    ├── INTERFACE.md     # data contract between graph construction and traversal
     ├── PROGRESS_LOG.md  # running log of work and decisions
     └── AI_USAGE.md      # AI-tool disclosure log
 ```
 
 ## Getting started
 
-Planned: create an environment, install `requirements.txt`, set the model names and API keys in `configs/`, then run the experiment scripts from `experiments/`. Every result in the report should be reproducible from a clean clone using a config file and a seed.
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+pytest
+```
+
+At this stage some traversal tests **fail on purpose** (`NotImplementedError`): they describe the behaviour of functions that are still to be written. API keys go in a local `.env` file, which is git-ignored and must never be committed. Every result in the report should be reproducible from a clean clone using a config file and a seed.
 
 ## Working agreements
 
@@ -88,19 +97,20 @@ Planned: create an environment, install `requirements.txt`, set the model names 
 - **Work on branches and open pull requests** so each member's contribution is visible and reviewed.
 - **Seeds and configs, not magic numbers.** Anything tunable lives in `configs/`.
 - **Keep `docs/PROGRESS_LOG.md` up to date** (date, who, what, decisions).
+- **Log AI-tool use in `docs/AI_USAGE.md`.** Everyone must be able to explain what they submit.
 - **Do not commit** API keys, large datasets or model weights.
 
 ## Team (Team 18)
 
-| Member | Role in proposal | GitHub |
-|---|---|---|
-| Pranjal Agrawal | Role 5: Relationship Ranking and Graph Traversal | @Pranjal-agl |
-| Chirantan S | TBD | TBD |
-| Shantanu Pandey | TBD | TBD |
-| Utkarsh Gopal Bhartariya | TBD | TBD |
-| Harshini Reddy Goli | TBD | TBD |
-| Suchendra Kumar Pothukuchi | TBD | TBD |
-| Prashant Pandurang Kadam | TBD | TBD |
+| Member | Role in the proposal |
+|---|---|
+| Chirantan S | Role 1: Data Ingestion and Gold Evidence; Role 4: Query Understanding and Evidence Planning |
+| Shantanu Pandey | Role 2: Semantic Entity and Concept Extraction |
+| Utkarsh Gopal Bhartariya | Role 3: Relationship Discovery and Graph Construction |
+| Pranjal Agrawal | Role 5: Relationship Ranking and Graph Traversal |
+| Prashant Kadam | Role 6: Dynamic Context Construction and LLM Integration |
+| Harshini Reddy Goli | Role 7: Baselines |
+| Suchendra Kumar Pothukuchi | Role 8: Evaluation, Ablation and Error Analysis |
 
 ## AI-tool disclosure
 
@@ -121,5 +131,4 @@ The course allows AI tools but requires disclosure and that every member can exp
 
 ## License
 
-MIT
-
+*TODO: decide with the team (course project; add a license file if the repo is public).*

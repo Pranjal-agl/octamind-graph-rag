@@ -1,0 +1,30 @@
+# Search and scoring settings for the traversal module (Role 5).
+# Every ablation in the proposal is a change to this file, not to the code.
+
+seed: 0
+
+# edge cost: cost(e|q) = alpha*(1-rel) + beta*(1-confidence) + eta*(1-strength) + gamma*depth
+alpha: 1.0      # query relevance
+beta: 0.5       # relationship confidence
+eta: 0.25       # relationship strength (support count)
+gamma: 0.1      # depth penalty
+
+# search: f(n) = g(n) + W*h(n)
+#   W = 0         -> uniform-cost search
+#   g dropped     -> greedy best-first (use use_g: false)
+#   W = 1         -> A*
+#   W > 1         -> weighted A* (satisficing)
+W: 1.5
+use_g: true
+
+# beam: keep the k best f-scores, or nodes within margin m of the best (null = off)
+beam_k: 5
+beam_margin: null
+max_depth: 4
+
+# path pruning: drop paths whose path relevance rho(P) < tau
+tau: 0.0
+
+# context selection
+budget_B: 1000        # token cap
+epsilon: 0.0          # stop when the next path's marginal utility falls below this
