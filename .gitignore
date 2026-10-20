@@ -1,6 +1,10 @@
 # secrets and local config
 .env
+.env.*
+!.env.example
 *.key
+*.pem
+credentials*.json
 
 # python
 __pycache__/
@@ -9,11 +13,19 @@ __pycache__/
 venv/
 .pytest_cache/
 
-# data, models and large outputs (keep folders, not contents)
+# data, models and large outputs: keep code and folder markers, ignore artifacts
 data/*
 !data/.gitkeep
+!data/__init__.py
+!data/*.py
+!data/loaders/
+!data/loaders/**
 results/*
 !results/.gitkeep
 *.ckpt
 *.pt
 .DS_Store
+
+# keep bytecode out of git even under re-included code directories
+__pycache__/
+*.pyc

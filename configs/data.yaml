@@ -1,0 +1,37 @@
+# Role 1 dataset ingestion settings.
+# Raw datasets are never committed (.gitignore); only this config and the
+# loader/sampling code are. Paths are relative to the repository root.
+#
+# MuSiQue is the only dataset with explicit 2-, 3- and 4-hop splits. 2Wiki and
+# HotpotQA are 2-hop in the official dev sets, so sampling simply keeps the hops
+# that exist instead of padding.
+
+seed: 0
+dev_per_hop: 200
+hop_levels: [2, 3, 4]
+
+raw_dir: data/raw
+out_dir: data/processed
+
+datasets:
+  musique:
+    enabled: true
+    # Official release: https://github.com/StonyBrookNLP/musique
+    # The data is on Google Drive (gdown id 1tGdADlNjWFaHLeZZGShh2IRcpO6Lv24h).
+    # Download manually or with the repo's download_data.sh, then extract here.
+    path: data/raw/musique/musique_ans_v1.0_dev.jsonl
+    url: null
+
+  twiki:
+    enabled: true
+    # Official release: https://github.com/Alab-NII/2wikimultihop
+    # Data zip: https://www.dropbox.com/s/npidmtadreo6df2/data.zip
+    # Extract dev.json here.
+    path: data/raw/twiki/dev.json
+    url: null
+
+  hotpotqa:
+    enabled: true
+    # Direct download for the distractor dev set.
+    path: data/raw/hotpotqa/hotpot_dev_distractor_v1.json
+    url: http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json
