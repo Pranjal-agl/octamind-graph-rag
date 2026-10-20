@@ -54,6 +54,12 @@ The heuristic `h` is not admissible, so it is used for ordering and pruning, not
 ## Data and evaluation
 
 - **Datasets:** MuSiQue-Ans (2-, 3- and 4-hop), 2WikiMultiHopQA, HotpotQA. 200 sampled dev questions per hop level, fixed seed.
+
+> **Temporary data note (2026-10-21):** MuSiQue-Ans and 2WikiMultiHopQA are
+> downloaded and sampling works. **HotpotQA is temporarily disabled** in
+> `configs/data.yaml` because all official and mirror download links are
+> currently dead. The loader is implemented; we will revisit getting it online
+> later. See `docs/DATA_NOTES.md`.
 - **Models (fixed for every system):** Gemini Flash at temperature 0 (exact model version to be pinned in `configs/`), and Gemini Embedding 2.
 - **Metrics:** EM and token-level F1; context tokens sent to the LLM; evidence recall and precision (mapped to source paragraphs); path recall where a verified gold chain exists; context reduction at matched accuracy; nodes expanded, peak frontier size and latency.
 - **Statistics:** paired bootstrap 95% confidence intervals.

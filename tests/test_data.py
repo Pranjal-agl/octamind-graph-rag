@@ -167,6 +167,26 @@ def test_musique_hop_follows_decomposition_length():
         assert record.hop_level == hop
 
 
+def test_musique_handles_duplicate_titles():
+    raw = musique_raw(hop=2)
+    # Same title, different text -> must get a distinct id.
+    raw["paragraphs"].append(
+        {"idx": 99, "title": "Alpha", "paragraph_text": "Different Alpha text.", "is_supporting": False}
+    )
+    # Same title, identical text -> must be dropped.
+    raw["paragraphs"].append(
+        {"idx": 100, "title": "Beta", "paragraph_text": "Beta text.", "is_supporting": False}
+    )
+
+    record = get_loader("musique").parse_records([raw])[0]
+    ids = [p.id for p in record.paragraphs]
+
+    assert len(ids) == len(set(ids))
+    assert any(pid.startswith("musique::Alpha#") for pid in ids)
+    assert ids.count("musique::Beta") == 1
+    assert validate_record(record) == []
+
+
 # --------------------------------------------------------------------------- #
 # 2Wiki / HotpotQA
 # --------------------------------------------------------------------------- #
@@ -330,7 +350,13 @@ def test_repo_config_loads():
     assert config.dev_per_hop == 200
     assert config.hop_levels == (2, 3, 4)
     assert set(config.datasets) == {"musique", "twiki", "hotpotqa"}
-    assert config.datasets["hotpotqa"].url
+    assert config.datasets["musique"].enabled is True
+    assert config.datasets["twiki"].enabled is True
+    # HotpotQA is temporarily disabled: no working public download source yet.
+    assert config.datasets["hotpotqa"].enabled is False
+    assert config.datasets["hotpotqa"].url is None
+    enabled = [name for name, ds in config.datasets.items() if ds.enabled]
+    assert enabled == ["musique", "twiki"]
     assert config.datasets["musique"].path.endswith("musique_ans_v1.0_dev.jsonl")
 
 

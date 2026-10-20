@@ -14,11 +14,10 @@ from .base import (
     GoldEvidence,
     GoldStep,
     LoaderError,
-    Paragraph,
     QuestionRecord,
     dedupe,
     infer_hop,
-    paragraph_id,
+    make_paragraph,
     record_id,
 )
 
@@ -37,23 +36,20 @@ class MusiqueLoader(BaseLoader):
         paragraphs = []
         gold_paragraphs = []
         idx_to_pid = {}
+        seen = {}
         for position, item in enumerate(raw_paragraphs):
             title = str(item.get("title", "")).strip()
-            pid = paragraph_id(self.name, title)
-            paragraphs.append(
-                Paragraph(
-                    id=pid,
-                    title=title,
-                    text=str(item.get("paragraph_text", item.get("text", ""))),
-                )
-            )
+            text = str(item.get("paragraph_text", item.get("text", "")))
+            paragraph, created = make_paragraph(self.name, title, text, seen)
+            if created:
+                paragraphs.append(paragraph)
             raw_idx = item.get("idx", position)
             try:
-                idx_to_pid[int(raw_idx)] = pid
+                idx_to_pid[int(raw_idx)] = paragraph.id
             except (TypeError, ValueError):
-                idx_to_pid[position] = pid
+                idx_to_pid[position] = paragraph.id
             if item.get("is_supporting"):
-                gold_paragraphs.append(pid)
+                gold_paragraphs.append(paragraph.id)
 
         decomposition = (
             raw.get("question_decomposition")

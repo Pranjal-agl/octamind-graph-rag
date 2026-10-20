@@ -30,6 +30,7 @@ same id across questions; that makes them usable as edge provenance.
 from __future__ import annotations
 
 import gzip
+import hashlib
 import json
 import shutil
 import urllib.request
@@ -161,6 +162,38 @@ def paragraph_id(dataset: str, title: str) -> str:
     return f"{dataset}::{str(title).strip()}"
 
 
+def make_paragraph(dataset: str, title: str, text: str, seen: dict) -> tuple:
+    """Return ``(paragraph, created)`` with a unique id inside one record.
+
+    Unique titles keep the clean ``<dataset>::<title>`` id. If the same title
+    appears again with different text (MuSiQue sometimes has several paragraphs
+    from one article), a content-hash suffix is added. If the text is identical,
+    the existing paragraph is returned with ``created=False`` so callers can
+    skip the duplicate.
+    """
+    base = paragraph_id(dataset, title)
+    text = str(text)
+
+    if base in seen:
+        if seen[base].text == text:
+            return seen[base], False
+        digest = hashlib.sha1(text.encode("utf-8")).hexdigest()[:8]
+        pid = f"{base}#{digest}"
+        if pid in seen:
+            if seen[pid].text == text:
+                return seen[pid], False
+            suffix = 2
+            while f"{pid}-{suffix}" in seen:
+                suffix += 1
+            pid = f"{pid}-{suffix}"
+    else:
+        pid = base
+
+    paragraph = Paragraph(id=pid, title=str(title).strip(), text=text)
+    seen[pid] = paragraph
+    return paragraph, True
+
+
 def infer_hop(raw: dict, default: int = 2) -> int:
     """Read an explicit hop count if the dataset provides one."""
     for key in ("hop", "num_hops", "hop_level", "num_hop"):
@@ -285,6 +318,7 @@ class BaseLoader:
     def _paragraphs_from_context(self, context: Iterable) -> list:
         """Convert HotpotQA-style ``[[title, [sentences]], ...]`` context."""
         paragraphs = []
+        seen = {}
         for entry in context or []:
             title = str(entry[0]).strip()
             sentences = entry[1] if len(entry) > 1 else []
@@ -292,7 +326,7 @@ class BaseLoader:
                 text = " ".join(str(s) for s in sentences)
             else:
                 text = str(sentences)
-            paragraphs.append(
-                Paragraph(id=paragraph_id(self.name, title), title=title, text=text)
-            )
+            paragraph, created = make_paragraph(self.name, title, text, seen)
+            if created:
+                paragraphs.append(paragraph)
         return paragraphs

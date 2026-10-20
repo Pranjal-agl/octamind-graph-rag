@@ -31,7 +31,10 @@ datasets:
     url: null
 
   hotpotqa:
-    enabled: true
-    # Direct download for the distractor dev set.
+    # TEMPORARY (2026-10-21): disabled. Every download route is currently dead
+    # (CMU 502, hotpotqa.github.io links dead, HuggingFace mirror is parquet-only).
+    # The loader is implemented and tested; re-enable when a working JSON mirror
+    # is found. Details in docs/DATA_NOTES.md.
+    enabled: false
     path: data/raw/hotpotqa/hotpot_dev_distractor_v1.json
-    url: http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json
+    url: null

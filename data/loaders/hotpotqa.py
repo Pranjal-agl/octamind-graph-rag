@@ -1,10 +1,16 @@
 """HotpotQA loader.
 
 HotpotQA uses the same ``context`` / ``supporting_facts`` shapes as 2Wiki, so
-the normalization is nearly identical. HotpotQA comes with a direct download
-URL for the distractor dev set; all questions are 2-hop.
+the normalization is nearly identical. All questions are 2-hop.
 
 Official release: https://hotpotqa.github.io/
+
+.. note::
+   The loader is complete, but as of 2026-10-21 the dataset could not be
+   downloaded from any public source (official CMU URLs return 502, the
+   homepage links are dead, and the HuggingFace mirror is parquet-only).
+   It is therefore **temporarily disabled** in ``configs/data.yaml``; see
+   ``docs/DATA_NOTES.md``. Re-enable once a working JSON mirror is found.
 """
 from __future__ import annotations
 
